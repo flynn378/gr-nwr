@@ -41,7 +41,7 @@ namespace gr {
       : gr::sync_block("lms_da_equalizer_ff",
               gr::io_signature::make(1, 1, sizeof(float)),
               gr::io_signature::make(1, 1, sizeof(float))),
-        fir_filter_fff(1, std::vector<float>(num_taps, 0.0f)),
+        fir_filter(1, std::vector<float>(num_taps, 0.0f)),
         d_sync_tag_key(pmt::intern(sync_tag)),
         d_new_taps(num_taps, 0.0f),
         d_updated(false),
@@ -55,9 +55,9 @@ namespace gr {
 
         if (num_taps > 0)
             d_new_taps[0] = 1.0f;
-        fir_filter_fff::set_taps(d_new_taps);
-        set_history(fir_filter_fff::ntaps());
-        declare_sample_delay(0, (fir_filter_fff::ntaps() - 1)/2);
+        fir_filter::set_taps(d_new_taps);
+        set_history(fir_filter::ntaps());
+        declare_sample_delay(0, (fir_filter::ntaps() - 1)/2);
     }
 
     lms_da_equalizer_ff_impl::~lms_da_equalizer_ff_impl()
@@ -76,17 +76,17 @@ namespace gr {
     lms_da_equalizer_ff_impl::taps() const
     {
         // FIXME check on tap reversal
-        return fir_filter_fff::taps();
+        return fir_filter::taps();
     }
 
     void
     lms_da_equalizer_ff_impl::reinit_taps(void)
     {
-        std::vector<float> initial_taps(fir_filter_fff::ntaps(), 0.0f);
+        std::vector<float> initial_taps(fir_filter::ntaps(), 0.0f);
 
         if (initial_taps.size() > 0)
             initial_taps[0] = 1.0;
-        fir_filter_fff::set_taps(initial_taps);
+        fir_filter::set_taps(initial_taps);
     }
 
     float
@@ -105,7 +105,7 @@ namespace gr {
     lms_da_equalizer_ff_impl::filter_no_adapt(float *out, const float *in,
                                               unsigned int len)
     {
-        fir_filter_fff::filterN(out, in, static_cast<unsigned long>(len));
+        fir_filter::filterN(out, in, static_cast<unsigned long>(len));
     }
 
     void
@@ -113,11 +113,11 @@ namespace gr {
                                                unsigned int len)
     {
         unsigned int i, j;
-        unsigned int n = fir_filter_fff::ntaps();
+        unsigned int n = fir_filter::ntaps();
 
         for (i = 0; i < len; i++) {
             // Filter the next sample
-            out[i] = fir_filter_fff::filter(&in[i]);
+            out[i] = fir_filter::filter(&in[i]);
 
             // Compute the a-priori error from the expected signal
             d_error = a_priori_error(i, out[i]);
@@ -130,7 +130,7 @@ namespace gr {
                 update_tap(d_taps[j], in[i+j]);
 
                 // Update aligned taps in fir_filter_fff object
-                fir_filter_fff::update_tap(d_taps[j], j);
+                fir_filter::update_tap(d_taps[j], j);
             }
         }
     }
@@ -196,9 +196,9 @@ namespace gr {
         // This is really only useful for changing the length of the
         // equalization filter.
         if (d_updated) {
-            fir_filter_fff::set_taps(d_new_taps);
-            set_history(fir_filter_fff::ntaps());
-            declare_sample_delay(0, (fir_filter_fff::ntaps() - 1)/2);
+            fir_filter::set_taps(d_new_taps);
+            set_history(fir_filter::ntaps());
+            declare_sample_delay(0, (fir_filter::ntaps() - 1)/2);
             d_updated = false;
             return 0; // history requirement may have changed
         }

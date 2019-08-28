@@ -9,11 +9,11 @@
 #
 
 install(FILES
-    nwr_lms_da_equalizer_ff.xml
-    nwr_burst_detect_and_tag.xml
-    nwr_correction_estimator_ff.xml
-    nwr_multiply_by_tag_value_ff.xml
-    nwr_add_tag_value_ff.xml
-    nwr_pll_refout_cc.xml
-    nwr_same_burst_decoder.xml DESTINATION share/gnuradio/grc/blocks
+    nwr_lms_da_equalizer_ff.block.yml
+    nwr_burst_detect_and_tag.block.yml
+    nwr_correction_estimator_ff.block.yml
+    nwr_multiply_by_tag_value_ff.block.yml
+    nwr_add_tag_value_ff.block.yml
+    nwr_pll_refout_cc.block.yml
+    nwr_same_burst_decoder.block.yml DESTINATION share/gnuradio/grc/blocks
 )

@@ -18,7 +18,7 @@ description here (python/__init__.py).
 # import swig generated symbols into the nwr namespace
 try:
 	# this might fail if the module is python-only
-	from nwr_swig import *
+	from .nwr_swig import *
 except ImportError:
 	pass
 

@@ -20,7 +20,7 @@ namespace gr {
   namespace nwr {
 
     class lms_da_equalizer_ff_impl
-       : public lms_da_equalizer_ff, filter::kernel::fir_filter_fff
+       : public lms_da_equalizer_ff, gr::filter::kernel::fir_filter_fff
     {
      private:
       pmt::pmt_t d_sync_tag_key;
@@ -41,7 +41,8 @@ namespace gr {
 
       static bool p_tag_compare(const tag_t &a, const tag_t &b);
       void prune_sync_tags(std::vector<tag_t> p_tags);
-
+    // protected:
+           
      public:
       lms_da_equalizer_ff_impl(const std::vector<float> &training_samples,
                                const std::string &sync_tag,

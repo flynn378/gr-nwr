@@ -23,7 +23,7 @@
 #include "config.h"
 #endif
 
-#include <multiply_by_tag_value_ff_impl.h>
+#include "multiply_by_tag_value_ff_impl.h"
 #include <gnuradio/io_signature.h>
 #include <volk/volk.h>
 

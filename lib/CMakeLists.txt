@@ -33,7 +33,12 @@ if(NOT nwr_sources)
 endif(NOT nwr_sources)
 
 add_library(gnuradio-nwr SHARED ${nwr_sources})
-target_link_libraries(gnuradio-nwr ${Boost_LIBRARIES} ${UHD_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-nwr ${Boost_LIBRARIES} ${UHD_LIBRARIES} gnuradio::gnuradio-runtime  gnuradio::gnuradio-filter gnuradio::gnuradio-fft)
+target_include_directories(gnuradio-nwr
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/>
+    PUBLIC $<INSTALL_INTERFACE:include>
+  )
 set_target_properties(gnuradio-nwr PROPERTIES DEFINE_SYMBOL "gnuradio_nwr_EXPORTS")
 
 if(APPLE)
@@ -46,30 +51,28 @@ endif(APPLE)
 # Install built library files
 ########################################################################
 include(GrMiscUtils)
-GR_LIBRARY_FOO(gnuradio-nwr RUNTIME_COMPONENT "nwr_runtime" DEVEL_COMPONENT "nwr_devel")
+GR_LIBRARY_FOO(gnuradio-nwr)
 
 ########################################################################
 # Build and register unit test
 ########################################################################
 include(GrTest)
 
-include_directories(${CPPUNIT_INCLUDE_DIRS})
-
-list(APPEND test_nwr_sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_nwr.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_nwr.cc
+list(APPEND test_threeb_sources
 )
+# Anything we need to link to for the unit tests go here
+list(APPEND GR_TEST_TARGET_DEPS gnuradio-nwr)
 
-add_executable(test-nwr ${test_nwr_sources})
+if(NOT test_nwr_sources)
+    MESSAGE(STATUS "No C++ unit tests... skipping")
+    return()
+endif(NOT test_nwr_sources)
 
-target_link_libraries(
-  test-nwr
-  ${GNURADIO_RUNTIME_LIBRARIES}
-  ${Boost_LIBRARIES}
-  ${UHD_LIBRARIES}
-  ${CPPUNIT_LIBRARIES}
-  gnuradio-nwr
-)
+foreach(qa_file ${test_nwr_sources})
+    GR_ADD_CPP_TEST("threeb_${qa_file}"
+        ${CMAKE_CURRENT_SOURCE_DIR}/${qa_file}
+    )
+endforeach(qa_file)
 
 GR_ADD_TEST(test_nwr test-nwr)
 
